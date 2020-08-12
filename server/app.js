@@ -32,7 +32,7 @@ app.use(express.urlencoded({
 
 const scrape = require('./scrape');
 
-app.get('/', async (req, res) => {
+app.get('/api/get', async (req, res) => {
     const {amount, postnummer} = req.query
 
     const a = await scrape.getData(postnummer ? postnummer : "18591", amount ? amount : 10)
