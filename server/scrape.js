@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
 
-exports.MAX_CACHE_AGE = 1000
+exports.MAX_CACHE_AGE = 60*60*24*14*1000
 exports.FILEPATH = 'data/'
 exports.FILEEXTENSION = '.data'
 
