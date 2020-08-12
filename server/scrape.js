@@ -2,7 +2,9 @@ const puppeteer = require('puppeteer')
 const fs = require('fs')
 const { rejects } = require('assert')
 
-const postnummer = "18591"
+const MAX_CACHE_AGE = 60*60*24*14*1000
+const FILEPATH = 'data/'
+const FILEEXTENSION = '.data'
 
 exports.scrapeWeb = async (postnummer) => {
     const browser = await puppeteer.launch({ headless: true })
@@ -59,8 +61,8 @@ exports.scrapeWeb = async (postnummer) => {
         completeList = completeList.concat(pagelist)
     }
 
-    console.log(completeList)
-    console.log(completeList.length)
+    // console.log(completeList)
+    // console.log(completeList.length)
 
     await browser.close()
 
@@ -68,7 +70,7 @@ exports.scrapeWeb = async (postnummer) => {
 }
 
 exports.randomData = function(postnummer, amount) {
-    const contents = JSON.parse(fs.readFileSync(postnummer, 'utf8'))
+    const contents = JSON.parse(fs.readFileSync(FILEPATH + postnummer + FILEEXTENSION, 'utf8'))
 
     let results = []
     for (let i = 0; i < amount; i++) {
@@ -78,35 +80,15 @@ exports.randomData = function(postnummer, amount) {
     return results
 }
 
-// exports.scrapeAndSave = async function(postnummer) {
-//     exports.scrapeWeb(postnummer).then(result => {
-//         try {
-//             fs.unlinkSync(postnummer)
-//         } catch (error) {
-//         }
-//         fs.writeFileSync(postnummer, JSON.stringify(result), 'utf8')
-//         // return Promise.resolve()
-//         const data = exports.randomData(postnummer, 10)
-//         return Promise.resolve(data)
-//         // fs.writeFile(postnummer, JSON.stringify(result), 'utf8', (err) => {
-//         //     if (err) {
-//         //         return err
-//         //     }
-//         //     console.log("File saved.")
-//         //     return Promise.resolve()
-//         // })
-//     })
-// }
-
 exports.scrapeAndSave = async function(postnummer, amount) {
     const results = await exports.scrapeWeb(postnummer)
 
     try {
-        fs.unlinkSync(postnummer)
+        fs.unlinkSync(FILEPATH + postnummer + FILEEXTENSION)
     } catch (error) {
     }
 
-    fs.writeFileSync(postnummer, JSON.stringify(results), 'utf8')
+    fs.writeFileSync(FILEPATH + postnummer + FILEEXTENSION, JSON.stringify(results), 'utf8')
 
     let randomized = []
     for (let i = 0; i < amount; i++) {
@@ -117,19 +99,15 @@ exports.scrapeAndSave = async function(postnummer, amount) {
 }
 
 exports.getData = async function(postnummer, amount) {
-    if (fs.existsSync(postnummer)) {
+    if (fs.existsSync(FILEPATH + postnummer + FILEEXTENSION)) {
         console.log("EXISTS")
-        const {birthtime} = fs.statSync(postnummer)
-
-        console.log(birthtime > Date.now - 60*60*24*5*1000)
-        console.log(birthtime)
+        const {birthtime} = fs.statSync(FILEPATH + postnummer + FILEEXTENSION)
 
         //Check if data is cached
         //If cache young enough
-        if (birthtime.getTime() > Date.now() - 60*60*24*5*1000) {
+        if (birthtime.getTime() > Date.now() - MAX_CACHE_AGE) {
             const data = exports.randomData(postnummer, amount)
             console.log("Taking from cache")
-            console.log(data)
             return Promise.resolve(data)
         //Cache is old, scrape from web
         } else {
