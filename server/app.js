@@ -40,13 +40,15 @@ const scrape = require('./scrape');
 // }
 
 app.get('/', async (req, res) => {
+    const {amount, postnummer} = req.query
+    console.log(req.query)
     // scrape.getData("18535", 10)
     // .then(data => {
     //     console.log(data)
     //     res.json(data)
-    // })
+    // })s
 
-    const a = await scrape.getData("18535", 10)
+    const a = await scrape.getData(postnummer ? postnummer : "18591", amount ? amount : 10)
     res.send(a)
     
     // await test()
