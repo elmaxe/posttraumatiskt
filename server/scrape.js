@@ -1,9 +1,9 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
 
-const MAX_CACHE_AGE = 60*60*24*14*1000
-const FILEPATH = 'data/'
-const FILEEXTENSION = '.data'
+exports.MAX_CACHE_AGE = 1000
+exports.FILEPATH = 'data/'
+exports.FILEEXTENSION = '.data'
 
 exports.scrapeWeb = async (postnummer) => {
     const browser = await puppeteer.launch({ headless: true })
@@ -62,7 +62,7 @@ exports.scrapeWeb = async (postnummer) => {
 }
 
 exports.randomData = function(postnummer, amount) {
-    const contents = JSON.parse(fs.readFileSync(FILEPATH + postnummer + FILEEXTENSION, 'utf8'))
+    const contents = JSON.parse(fs.readFileSync(exports.FILEPATH + postnummer + exports.FILEEXTENSION, 'utf8'))
 
     let results = []
     for (let i = 0; i < amount; i++) {
@@ -75,11 +75,11 @@ exports.scrapeAndSave = async function(postnummer, amount) {
     const results = await exports.scrapeWeb(postnummer)
 
     try {
-        fs.unlinkSync(FILEPATH + postnummer + FILEEXTENSION)
+        fs.unlinkSync(exports.FILEPATH + postnummer + exports.FILEEXTENSION)
     } catch (error) {
     }
 
-    fs.writeFileSync(FILEPATH + postnummer + FILEEXTENSION, JSON.stringify(results), 'utf8')
+    fs.writeFileSync(exports.FILEPATH + postnummer + exports.FILEEXTENSION, JSON.stringify(results), 'utf8')
 
     let randomized = []
     for (let i = 0; i < amount; i++) {
@@ -90,13 +90,13 @@ exports.scrapeAndSave = async function(postnummer, amount) {
 }
 
 exports.getData = async function(postnummer, amount) {
-    if (fs.existsSync(FILEPATH + postnummer + FILEEXTENSION)) {
+    if (fs.existsSync(exports.FILEPATH + postnummer + exports.FILEEXTENSION)) {
         console.log("EXISTS")
-        const {birthtime} = fs.statSync(FILEPATH + postnummer + FILEEXTENSION)
+        const {birthtime} = fs.statSync(exports.FILEPATH + postnummer + exports.FILEEXTENSION)
 
         //Check if data is cached
         //If cache young enough
-        if (birthtime.getTime() > Date.now() - MAX_CACHE_AGE) {
+        if (birthtime.getTime() > Date.now() - exports.MAX_CACHE_AGE) {
             const data = exports.randomData(postnummer, amount)
             console.log("Taking from cache")
             return Promise.resolve(data)
