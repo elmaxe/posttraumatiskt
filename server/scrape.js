@@ -1,6 +1,5 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
-const { rejects } = require('assert')
 
 const MAX_CACHE_AGE = 60*60*24*14*1000
 const FILEPATH = 'data/'
@@ -27,6 +26,7 @@ exports.scrapeWeb = async (postnummer) => {
 
     let completeList = []
 
+    //Hitta.se will space separate its numbers. Ex 1 179 instead of 1179
     const loops = Math.ceil(hits.replace(" ", "")/25)
 
     //Loop through all pages, 25 items per page
@@ -36,33 +36,25 @@ exports.scrapeWeb = async (postnummer) => {
         
         const persons = await page.evaluate(() => {
             const person = document.getElementsByClassName("display-name")
-            // console.log(person)
             return Array.from(person, x => x.innerHTML)
         })
 
-        // console.log(persons)
-
         const addresses = await page.evaluate(() => {
             const address = document.getElementsByClassName("address")
-            // console.log(address)
             //The split is to remove the postnummer and city after the address
+            //Saves many bytes and the information is unnecessary
             return Array.from(address, x => x.innerHTML.split(",")[0])
         })
-
-        // console.log(addresses)
         
-        //All people on this page
+        //Store person and his/her address in an object, put it into an array.
         const pagelist = []
         for (let i = 0; i < persons.length; i++) {
             pagelist[i] = { name: persons[i], address: addresses[i] }
         }
-        // console.log(pagelist)
+
         //Concat to the master list
         completeList = completeList.concat(pagelist)
     }
-
-    // console.log(completeList)
-    // console.log(completeList.length)
 
     await browser.close()
 
@@ -76,7 +68,6 @@ exports.randomData = function(postnummer, amount) {
     for (let i = 0; i < amount; i++) {
         results = results.concat(contents[Math.floor(Math.random() * contents.length)])
     }
-    // console.log(results)
     return results
 }
 
