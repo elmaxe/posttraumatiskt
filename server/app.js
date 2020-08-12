@@ -30,8 +30,36 @@ app.use(express.urlencoded({
     extended: true,
 }));
 
-app.get('/', (req, res) => {
-    res.send("Hej")
+const scrape = require('./scrape');
+// const { resolve } = require('path');
+
+// const test = async function() {
+//     return new Promise((resolve, reject) => {
+//         setTimeout(resolve, 5000)
+//     });
+// }
+
+app.get('/', async (req, res) => {
+    // scrape.getData("18535", 10)
+    // .then(data => {
+    //     console.log(data)
+    //     res.json(data)
+    // })
+
+    const a = await scrape.getData("18535", 10)
+    res.send(a)
+    
+    // await test()
+    // res.send("Hej")
+
+    // .then(data => {
+    //     console.log("result: " + data)
+    //     res.send(data)
+    // })
+    // .then(result => {
+    //     console.log("PROMISE")
+    //     console.log(result)
+    // })
 })
 
 // app.use(express.static(path.join(__dirname, '../client/build')))
