@@ -52,5 +52,5 @@ const httpServer = http.createServer(app)
 //     cert: fs.readFileSync('../../axelelmarsson_certs/cert.pem', 'utf8'),
 //     ca: fs.readFileSync('../../axelelmarsson_certs/chain.pem', 'utf8')
 //}, app)
-httpServer.listen(8001, () => console.log("Listening on 8001"))
+httpServer.listen(8001, () => console.log("Listening on 8100"))
 //httpsServer.listen(8443)
